@@ -1,4 +1,3 @@
-#to create window
 from tkinter import *
 import tkinter as tk
 import time
@@ -80,15 +79,15 @@ class stickman:
 		self.canvas.pack(expand=YES, fill=BOTH)
 
 		self.images_left = [
-		PhotoImage(file="runningPos1Left.png"),
-		PhotoImage(file="runningPos2Left.png"),
-		PhotoImage(file="runningPos3Left.png")
+		PhotoImage(file="res/runningPos1Left.png"),
+		PhotoImage(file="res/runningPos2Left.png"),
+		PhotoImage(file="res/runningPos3Left.png")
 		]
 
 		self.images_right = [
-		PhotoImage(file ="runningPos1Right.png"),
-		PhotoImage(file="runningPos2Right.png"),
-		PhotoImage(file="runningPos3Right.png")
+		PhotoImage(file ="res/runningPos1Right.png"),
+		PhotoImage(file="res/runningPos2Right.png"),
+		PhotoImage(file="res/runningPos3Right.png")
 		]
 		self.image = self.canvas.create_image(50,550,image=self.images_right[self.currentImage],anchor=S)
 		window.bind('<Right>', self.right_pos)
