@@ -6,7 +6,7 @@ import time
 
 
 class stickman:
-        #constructor
+        #constructor saying what would be a part of the layout
         def __init__(self):
                 self.canvas=None
                 self.image=None
@@ -20,15 +20,26 @@ class stickman:
                 
         def right(self):
                 
-                self.canvas.move(self.image, 35, 0)
+                self.canvas.move(self.image, 25, 0)
                 #print("in right")
 
         def right_pos(self,event):
+                if((self.canvas.coords(self.image)[0] + 25 ) < 1350):
+                        self.canvas.move(self.image,25,0)
+                        self.canvas.update()
+                        time.sleep(0.2)
+                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
+                if len(overlaptuple)>1:
+                        #self.canvas.move(self.image,25,0)
+                        #self.canvas.update()
+                        time.sleep(0.2)
+                else:
+                        self.fall_down()
                 #print(tk.find_overlapping(self.image))
                # print(self.canvas.bbox(self.image))
                 #print(self.canvas.find_overlapping(self.canvas.bbox(self.image)))
-                if((self.canvas.coords(self.image)[0]) <= 1300):
-                        if(time.time()-self.lastTime > 0.1):
+                if((self.canvas.coords(self.image)[0]) <= 1310):#setting the border/boundary
+                        if(time.time()-self.lastTime > 0.1):#checking ang collaborating with time
                                 if(self.currentImage>=2):
                                         self.newImage=-1
                                 if(self.currentImage==0):
@@ -44,10 +55,24 @@ class stickman:
         
         #movement of stickman to left 
         def left(self):
-                self.canvas.move(self.image,-35,0)
+                self.canvas.move(self.image,-25,0)
                 #print("in left")
         
         def left_pos(self,event):
+
+                
+                if(((self.canvas.coords(self.image)[0])-25) >= 30):
+                        self.canvas.move(self.image,-25,0)
+                        self.canvas.update()
+                        time.sleep(0.2)
+                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
+                if len(overlaptuple)>1:
+                        #self.canvas.move(self.image,-25,0)
+                        #self.canvas.update()
+                        time.sleep(0.1)
+                else:
+                        self.fall_down()
+                        
                 if((self.canvas.coords(self.image)[0]) >= 30):
                         if(time.time()-self.lastTime > 0.1):
                                 if(self.currentImage>=2):
@@ -65,14 +90,29 @@ class stickman:
         
         #stickman jumping
         def jump_up(self):
-                self.canvas.move(self.image,0,-100)
-                self.canvas.update()
-                time.sleep(0.2)
-                self.fall_down()
+                #declaing the tuple
+                if(((self.canvas.coords(self.image)[1])-100) >100):
+                        self.canvas.move(self.image,0,-100)
+                        self.canvas.update()
+                        time.sleep(0.1)
+                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
+                
+                if len(overlaptuple)>1:
+                       #self.canvas.move(self.image,0,-100)
+                        self.canvas.update()
+                        time.sleep(0.2)
+                else:
+                        #self.canvas.move(self.image,0,100)
+                        #self.canvas.update()
+                        #time.sleep(0.1)
+                        self.fall_down()
+        
+                        
 #when the stickman falls down how it should move
         
         def fall_down(self):
-                self.canvas.move(self.image,0,100)
+                if(self.canvas.bbox(self.image)[1] < 550):
+                        self.canvas.move(self.image,0,100)
                 self.canvas.update()
 
 #when stickman jumps
@@ -89,21 +129,21 @@ class stickman:
          #def display_platforms(self):
                  
         def display_platforms_Layout1(self,event):
-                self.image = self.canvas.create_image(600,300,image=self.images_platforms[1],anchor=S)#red
-                self.image = self.canvas.create_image(900,250,image=self.images_platforms[1],anchor=S)#red
-                self.image = self.canvas.create_image(1120,150,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(720,200,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(480,400,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(300,350,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(180,450,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(60,550,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(180,600,image=self.images_platforms[0],anchor=S)#start
-                self.image = self.canvas.create_image(660,450,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(840,400,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(1120,350,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(1240,250,image=self.images_platforms[2],anchor=S)#end
-                self.image = self.canvas.create_image(360,650,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(1000,400,image=self.images_platforms[0],anchor=S)#normal
+                p1 = self.canvas.create_image(600,300,image=self.images_platforms[1],anchor=S)#red
+                p2 = self.canvas.create_image(900,250,image=self.images_platforms[1],anchor=S)#red
+                p3 = self.canvas.create_image(1120,150,image=self.images_platforms[0],anchor=S)#normal
+                p4 = self.canvas.create_image(720,200,image=self.images_platforms[0],anchor=S)#normal
+                p5 = self.canvas.create_image(480,400,image=self.images_platforms[0],anchor=S)#normal
+                p6 = self.canvas.create_image(300,350,image=self.images_platforms[0],anchor=S)#normal
+                p7 = self.canvas.create_image(180,450,image=self.images_platforms[0],anchor=S)#normal
+                p8 = self.canvas.create_image(60,550,image=self.images_platforms[0],anchor=S)#normal
+                p9 = self.canvas.create_image(180,600,image=self.images_platforms[0],anchor=S)#start
+                p10 = self.canvas.create_image(660,450,image=self.images_platforms[0],anchor=S)#normal
+                p11 = self.canvas.create_image(840,400,image=self.images_platforms[0],anchor=S)#normal
+                p12 = self.canvas.create_image(1120,350,image=self.images_platforms[0],anchor=S)#normal
+                p13 = self.canvas.create_image(1240,250,image=self.images_platforms[2],anchor=S)#end
+                p14 = self.canvas.create_image(360,650,image=self.images_platforms[0],anchor=S)#normal
+                p15 = self.canvas.create_image(1000,400,image=self.images_platforms[0],anchor=S)#normal
                 self.image = self.canvas.create_image(50,700,image=self.images_right[self.currentImage],anchor=S)
 
         def main(self):
