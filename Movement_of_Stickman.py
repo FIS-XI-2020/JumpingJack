@@ -4,7 +4,6 @@ import tkinter as tk
 import time
 
 
-
 class stickman:
         #constructor saying what would be a part of the layout
         def __init__(self):
@@ -16,6 +15,16 @@ class stickman:
                 self.images_right=None
                 self.images_platforms=None
                 self.newImage=0
+                self.overlaps_get(self, tuple, tuple, tuple)
+                self.platforms = { } 
+
+        def overlaps_get(self,x1, y1, x2, y2):
+                plank_list = [] # make a list to hold overlap objects
+                c_object = self.canvas.find_overlapping(x1, y1, x2, y2)
+                for k,v in platforms.items():  # iterate over ovals dict
+                        if v in c_object:      # if the value of a key is in the overlap tuple
+                            plank_list.append(k)# add the key to the list
+                return plank_list
 
                 
         def right(self):
@@ -81,8 +90,7 @@ class stickman:
                                         self.newImage=1
                                 self.currentImage= self.currentImage+self.newImage
                                 self.lastTime=time.time()
-                #print(self.currentImage)
-                
+                #print(self.currentImage)                
                         self.canvas.itemconfig(self.image,image=self.images_left[self.currentImage])
                 #print("In right_pos")
                         self.left()
@@ -95,8 +103,8 @@ class stickman:
                         self.canvas.move(self.image,0,-100)
                         self.canvas.update()
                         time.sleep(0.1)
-                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
-                
+                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],(self.canvas.bbox(self.image)[1]+100),self.canvas.bbox(self.image)[2],(self.canvas.bbox(self.image)[3]+100))
+                print(overlaps_get(self.image, self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3]))
                 if len(overlaptuple)>1:
                        #self.canvas.move(self.image,0,-100)
                         self.canvas.update()
@@ -127,6 +135,7 @@ class stickman:
 
                 #placement of platforms
          #def display_platforms(self):
+        
                  
         def display_platforms_Layout1(self,event):
                 p1 = self.canvas.create_image(600,300,image=self.images_platforms[1],anchor=S)#red
@@ -145,7 +154,23 @@ class stickman:
                 p14 = self.canvas.create_image(360,650,image=self.images_platforms[0],anchor=S)#normal
                 p15 = self.canvas.create_image(1000,400,image=self.images_platforms[0],anchor=S)#normal
                 self.image = self.canvas.create_image(50,700,image=self.images_right[self.currentImage],anchor=S)
-
+                
+                platforms['p1'] = p1
+                platforms['p2'] = p2
+                platforms['p3'] = p3
+                platforms['p4'] = p4
+                platforms['p5'] = p5
+                platforms['p6'] = p6
+                platforms['p7'] = p7
+                platforms['p8'] = p8
+                platforms['p9'] = p9
+                platforms['p10'] = p10
+                platforms['p11'] = p11
+                platforms['p12'] = p12
+                platforms['p13'] = p13
+                platforms['p14'] = p14
+                platforms['p15'] = p15
+                
         def main(self):
                 window = tk.Tk()
                 window.title(" Jumping Jack ")
