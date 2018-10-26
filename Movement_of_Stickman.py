@@ -15,13 +15,13 @@ class stickman:
                 self.images_right=None
                 self.images_platforms=None
                 self.newImage=0
-                self.overlaps_get(self, tuple, tuple, tuple)
-                self.platforms = { } 
+                self.platforms = {}
 
-        def overlaps_get(self,x1, y1, x2, y2):
+
+        def overlaps_get(self):
                 plank_list = [] # make a list to hold overlap objects
-                c_object = self.canvas.find_overlapping(x1, y1, x2, y2)
-                for k,v in platforms.items():  # iterate over ovals dict
+                c_object = self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
+                for k,v in self.platforms.items():  # iterate over ovals dict
                         if v in c_object:      # if the value of a key is in the overlap tuple
                             plank_list.append(k)# add the key to the list
                 return plank_list
@@ -104,7 +104,7 @@ class stickman:
                         self.canvas.update()
                         time.sleep(0.1)
                 overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],(self.canvas.bbox(self.image)[1]+100),self.canvas.bbox(self.image)[2],(self.canvas.bbox(self.image)[3]+100))
-                print(overlaps_get(self.image, self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3]))
+                print(self.overlaps_get())
                 if len(overlaptuple)>1:
                        #self.canvas.move(self.image,0,-100)
                         self.canvas.update()
@@ -155,21 +155,25 @@ class stickman:
                 p15 = self.canvas.create_image(1000,400,image=self.images_platforms[0],anchor=S)#normal
                 self.image = self.canvas.create_image(50,700,image=self.images_right[self.currentImage],anchor=S)
                 
-                platforms['p1'] = p1
-                platforms['p2'] = p2
-                platforms['p3'] = p3
-                platforms['p4'] = p4
-                platforms['p5'] = p5
-                platforms['p6'] = p6
-                platforms['p7'] = p7
-                platforms['p8'] = p8
-                platforms['p9'] = p9
-                platforms['p10'] = p10
-                platforms['p11'] = p11
-                platforms['p12'] = p12
-                platforms['p13'] = p13
-                platforms['p14'] = p14
-                platforms['p15'] = p15
+                self.platforms['p1']= p1
+                self.platforms['p2']= p2
+                self.platforms['p3']= p3
+                self.platforms['p4']= p4
+                self.platforms['p5']= p5
+                self.platforms['p6']= p6
+                self.platforms['p7']= p7
+                self.platforms['p8']= p8
+                self.platforms['p9']= p9
+                self.platforms['p10']= p10
+                self.platforms['p11']= p11
+                self.platforms['p12']= p12
+                self.platforms['p13']= p13
+                self.platforms['p14']= p14
+                self.platforms['p15']= p15
+
+
+
+
                 
         def main(self):
                 window = tk.Tk()
