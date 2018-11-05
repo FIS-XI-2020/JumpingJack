@@ -1,219 +1,266 @@
-#these statements are for including the tkinter library functionalities 
 from tkinter import *
-import tkinter as tk
+import random
 import time
 
+class Game:
+    def __init__(self):
+        self.tk = Tk()
+        self.tk.title("Mr. Stick Man Races for the Exit")
+        self.tk.resizable(0, 0)
+        self.tk.wm_attributes("-topmost", 1)
+        self.canvas = Canvas(self.tk, width=500, height=500, highlightthickness=0)
+        self.canvas.pack()
+        self.tk.update()
+        self.canvas_height = 500
+        self.canvas_width = 500
+        self.bg = PhotoImage(file="res/background.gif")
+        w = self.bg.width()
+        h = self.bg.height()
+        for x in range(0, 5):
+            for y in range(0, 5):
+                self.canvas.create_image(x * w, y * h, image=self.bg, anchor='nw')
+        self.sprites = []
+        self.running = True
 
-class stickman:
-        #constructor saying what would be a part of the layout
-        def __init__(self):
-                self.canvas=None
-                self.image=None
-                self.currentImage=0
-                self.lastTime=time.time()
-                self.images_left=None
-                self.images_right=None
-                self.images_platforms=None
-                self.newImage=0
-                self.platforms = {}
+    def mainloop(self):
+        while 1:
+            if self.running == True:
+                for sprite in self.sprites:
+                    sprite.move()
+            self.tk.update_idletasks()
+            self.tk.update()
+            time.sleep(0.01)
 
+class Coords:
+    def __init__(self, x1=0, y1=0, x2=0, y2=0):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
 
-        def overlaps_get(self):
-                plank_list = [] # make a list to hold overlap objects
-                c_object = self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
-                for k,v in self.platforms.items():  # iterate over ovals dict
-                        if v in c_object:      # if the value of a key is in the overlap tuple
-                            plank_list.append(k)# add the key to the list
-                return plank_list
+def within_x(co1, co2):
+    if (co1.x1 > co2.x1 and co1.x1 < co2.x2) \
+            or (co1.x2 > co2.x1 and co1.x2 < co2.x2) \
+            or (co2.x1 > co1.x1 and co2.x1 < co1.x2) \
+            or (co2.x2 > co1.x1 and co2.x2 < co1.x1):
+        return True
+    else:
+        return False
 
-                
-        def right(self):
-                
-                self.canvas.move(self.image, 25, 0)
-                #print("in right")
+def within_y(co1, co2):
+    if (co1.y1 > co2.y1 and co1.y1 < co2.y2) \
+            or (co1.y2 > co2.y1 and co1.y2 < co2.y2) \
+            or (co2.y1 > co1.y1 and co2.y1 < co1.y2) \
+            or (co2.y2 > co1.y1 and co2.y2 < co1.y1):
+        return True
+    else:
+        return False
 
-        def right_pos(self,event):
-                if((self.canvas.coords(self.image)[0] + 25 ) < 1350):
-                        self.canvas.move(self.image,25,0)
-                        self.canvas.update()
-                        time.sleep(0.2)
-                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
-                if len(overlaptuple)>1:
-                        #self.canvas.move(self.image,25,0)
-                        #self.canvas.update()
-                        time.sleep(0.2)
-                else:
-                        self.fall_down()
-                #print(tk.find_overlapping(self.image))
-               # print(self.canvas.bbox(self.image))
-                #print(self.canvas.find_overlapping(self.canvas.bbox(self.image)))
-                if((self.canvas.coords(self.image)[0]) <= 1310):#setting the border/boundary
-                        if(time.time()-self.lastTime > 0.1):#checking ang collaborating with time
-                                if(self.currentImage>=2):
-                                        self.newImage=-1
-                                if(self.currentImage==0):
-                                        self.newImage=1
-                                self.currentImage= self.currentImage+self.newImage
-                                self.lastTime=time.time()
-                #print(self.currentImage)
-                
-                        self.canvas.itemconfig(self.image,image=self.images_right[self.currentImage])
-                #print("In right_pos")
-                        self.right()
-                        self.canvas.update()
+def collided_left(co1, co2):
+    if within_y(co1, co2):
+        if co1.x1 <= co2.x2 and co1.x1 >= co2.x1:
+            return True
+    return False
+
+def collided_right(co1, co2):
+    if within_y(co1, co2):
+        if co1.x2 >= co2.x1 and co1.x2 <= co2.x2:
+            return True
+    return False
+
+def collided_top(co1, co2):
+    if within_x(co1, co2):
+        if co1.y1 <= co2.y2 and co1.y1 >= co2.y1:
+            return True
+    return False
+
+def collided_bottom(y, co1, co2):
+    if within_x(co1, co2):
+        y_calc = co1.y2 + y
+        if y_calc >= co2.y1 and y_calc <= co2.y2:
+            return True
+    return False
+
+class Sprite:
+    def __init__(self, game):
+        self.game = game
+        self.endgame = False
+        self.coordinates = None
+    def move(self):
+        pass
+    def coords(self):
+        return self.coordinates
+
+class PlatformSprite(Sprite):
+    def __init__(self, game, photo_image, x, y, width, height):
+        Sprite.__init__(self, game)
+        self.photo_image = photo_image
+        self.image = game.canvas.create_image(x, y, image=self.photo_image, anchor='nw')
+        self.coordinates = Coords(x, y, x + width, y + height)
+
+class StickFigureSprite(Sprite):
+    def __init__(self, game):
+        Sprite.__init__(self, game)
+        self.images_left = [
+            PhotoImage(file="res/runningPos1Left.png"),
+            PhotoImage(file="res/runningPos2Left.png"),
+            PhotoImage(file="res/runningPos3Left.png")
+        ]
+        self.images_right = [
+            PhotoImage(file="res/runningPos1Right.png"),
+            PhotoImage(file="res/runningPos2Right.png"),
+            PhotoImage(file="res/runningPos3Right.png")
+        ]
+        self.image = game.canvas.create_image(200, 470, image=self.images_left[0], anchor='nw')
+        self.x = -2
+        self.y = 0
+        self.current_image = 0
+        self.current_image_add = 1
+        self.jump_count = 0
+        self.last_time = time.time()
+        self.coordinates = Coords()
+        game.canvas.bind_all('<KeyPress-Left>', self.turn_left)
+        game.canvas.bind_all('<KeyPress-Right>', self.turn_right)
+        game.canvas.bind_all('<space>', self.jump)
+
+    def turn_left(self, evt):
+        if self.y == 0:
+            self.x = -2
+
+    def turn_right(self, evt):
+        if self.y == 0:
+            self.x = 2
+
+    def jump(self, evt):
+        if self.y == 0:
+            self.y = -4
+            self.jump_count = 0
+            
+    def animate(self):
+        if self.x != 0 and self.y == 0:
+            if time.time() - self.last_time > 0.1:
+                self.last_time = time.time()
+                self.current_image += self.current_image_add
+                if self.current_image >= 2:
+                    self.current_image_add = -1
+                if self.current_image <= 0:
+                    self.current_image_add = 1
+        if self.x < 0:
+            if self.y != 0:
+                self.game.canvas.itemconfig(self.image, image=self.images_left[2])
+            else:
+                self.game.canvas.itemconfig(self.image, image=self.images_left[self.current_image])
+        elif self.x > 0:
+            if self.y != 0:
+                self.game.canvas.itemconfig(self.image, image=self.images_right[2])
+            else:
+                self.game.canvas.itemconfig(self.image, image=self.images_right[self.current_image])
+
+    def coords(self):
+        xy = list(self.game.canvas.coords(self.image))
+        self.coordinates.x1 = xy[0]
+        self.coordinates.y1 = xy[1]
+        self.coordinates.x2 = xy[0] + 27
+        self.coordinates.y2 = xy[1] + 30
+        return self.coordinates
         
-        #movement of stickman to left 
-        def left(self):
-                self.canvas.move(self.image,-25,0)
-                #print("in left")
+    def move(self):
+        self.animate()
+        if self.y < 0:
+            self.jump_count += 1
+            if self.jump_count > 20:
+                self.y = 4
+        if self.y > 0:
+            self.jump_count -= 1
+            
+        co = self.coords()
+        left = True
+        right = True
+        top = True
+        bottom = True
+        falling = True
         
-        def left_pos(self,event):
+        if self.y > 0 and co.y2 >= self.game.canvas_height:
+            self.y = 0
+            bottom = False
+        elif self.y < 0 and co.y1 <= 0:
+            self.y = 0
+            top = False
 
+        if self.x > 0 and co.x2 >= self.game.canvas_width:
+            self.x = 0
+            right = False
+        elif self.x < 0 and co.x1 <= 0:
+            self.x = 0
+            left = False
+
+        for sprite in self.game.sprites:
+            if sprite == self:
+                continue
+            sprite_co = sprite.coords()
+            if top and self.y < 0 and collided_top(co, sprite_co):
+                self.y = -self.y
+                top = False
                 
-                if(((self.canvas.coords(self.image)[0])-25) >= 30):
-                        self.canvas.move(self.image,-25,0)
-                        self.canvas.update()
-                        time.sleep(0.2)
-                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],self.canvas.bbox(self.image)[1],self.canvas.bbox(self.image)[2],self.canvas.bbox(self.image)[3])
-                if len(overlaptuple)>1:
-                        #self.canvas.move(self.image,-25,0)
-                        #self.canvas.update()
-                        time.sleep(0.1)
-                else:
-                        self.fall_down()
-                        
-                if((self.canvas.coords(self.image)[0]) >= 30):
-                        if(time.time()-self.lastTime > 0.1):
-                                if(self.currentImage>=2):
-                                        self.newImage=-1
-                                if(self.currentImage==0):
-                                        self.newImage=1
-                                self.currentImage= self.currentImage+self.newImage
-                                self.lastTime=time.time()
-                #print(self.currentImage)                
-                        self.canvas.itemconfig(self.image,image=self.images_left[self.currentImage])
-                #print("In right_pos")
-                        self.left()
-                        self.canvas.update()
+            if bottom and self.y > 0 and collided_bottom(self.y, co, sprite_co):
+                self.y = sprite_co.y1 - co.y2
+                if self.y < 0:
+                    self.y = 0
+                bottom = False
+                top = False
+
+            if bottom and falling and self.y == 0 and co.y2 < self.game.canvas_height and collided_bottom(1, co, sprite_co):
+                falling = False
+                
+            if left and self.x < 0 and collided_left(co, sprite_co):
+                self.x = 0
+                left = False
+                if sprite.endgame:
+                    self.game.running = False
+
+            if right and self.x > 0 and collided_right(co, sprite_co):
+                self.x = 0
+                right = False
+                if sprite.endgame:
+                    self.game.running = False
+            
+        if falling and bottom and self.y == 0 and co.y2 < self.game.canvas_height:
+            self.y = 4
         
-        #stickman jumping
-        def jump_up(self):
-                #declaing the tuple
-                if(((self.canvas.coords(self.image)[1])-100) >100):
-                        self.canvas.move(self.image,0,-100)
-                        self.canvas.update()
-                        time.sleep(0.1)
-                overlaptuple=self.canvas.find_overlapping(self.canvas.bbox(self.image)[0],(self.canvas.bbox(self.image)[1]+100),self.canvas.bbox(self.image)[2],(self.canvas.bbox(self.image)[3]+100))
-                print(self.overlaps_get())
-                if len(overlaptuple)>1:
-                       #self.canvas.move(self.image,0,-100)
-                        self.canvas.update()
-                        time.sleep(0.2)
-                else:
-                        #self.canvas.move(self.image,0,100)
-                        #self.canvas.update()
-                        #time.sleep(0.1)
-                        self.fall_down()
-        
-                        
-#when the stickman falls down how it should move
-        
-        def fall_down(self):
-                if(self.canvas.bbox(self.image)[1] < 550):
-                        self.canvas.move(self.image,0,100)
-                self.canvas.update()
+        self.game.canvas.move(self.image, self.x, self.y)
 
-#when stickman jumps
-        def jump_pos(self, event):
-                self.canvas.itemconfig(self.image,image=self.images_right[2])
-                self.jump_up()
-                self.canvas.itemconfig(self.image,image=self.images_left[2])
-                self.canvas.update()
-#movement from right and left way the stickman should move
-#screen dimensions and colour
-        #import image   
-
-                #placement of platforms
-         #def display_platforms(self):
-        
-                 
-        def display_platforms_Layout1(self,event):
-                p1 = self.canvas.create_image(600,300,image=self.images_platforms[1],anchor=S)#red
-                p2 = self.canvas.create_image(900,250,image=self.images_platforms[1],anchor=S)#red
-                p3 = self.canvas.create_image(1120,150,image=self.images_platforms[0],anchor=S)#normal
-                p4 = self.canvas.create_image(720,200,image=self.images_platforms[0],anchor=S)#normal
-                p5 = self.canvas.create_image(480,400,image=self.images_platforms[0],anchor=S)#normal
-                p6 = self.canvas.create_image(300,350,image=self.images_platforms[0],anchor=S)#normal
-                p7 = self.canvas.create_image(180,450,image=self.images_platforms[0],anchor=S)#normal
-                p8 = self.canvas.create_image(60,550,image=self.images_platforms[0],anchor=S)#normal
-                p9 = self.canvas.create_image(180,600,image=self.images_platforms[0],anchor=S)#start
-                p10 = self.canvas.create_image(660,450,image=self.images_platforms[0],anchor=S)#normal
-                p11 = self.canvas.create_image(840,400,image=self.images_platforms[0],anchor=S)#normal
-                p12 = self.canvas.create_image(1120,350,image=self.images_platforms[0],anchor=S)#normal
-                p13 = self.canvas.create_image(1240,250,image=self.images_platforms[2],anchor=S)#end
-                p14 = self.canvas.create_image(360,650,image=self.images_platforms[0],anchor=S)#normal
-                p15 = self.canvas.create_image(1000,400,image=self.images_platforms[0],anchor=S)#normal
-                self.image = self.canvas.create_image(50,700,image=self.images_right[self.currentImage],anchor=S)
-                
-                self.platforms['p1']= p1
-                self.platforms['p2']= p2
-                self.platforms['p3']= p3
-                self.platforms['p4']= p4
-                self.platforms['p5']= p5
-                self.platforms['p6']= p6
-                self.platforms['p7']= p7
-                self.platforms['p8']= p8
-                self.platforms['p9']= p9
-                self.platforms['p10']= p10
-                self.platforms['p11']= p11
-                self.platforms['p12']= p12
-                self.platforms['p13']= p13
-                self.platforms['p14']= p14
-                self.platforms['p15']= p15
+class DoorSprite(Sprite):
+    def __init__(self, game, photo_image, x, y, width, height):
+        Sprite.__init__(self, game)
+        self.photo_image = photo_image
+        self.image = game.canvas.create_image(x, y, image=self.photo_image, anchor='nw')
+        self.coordinates = Coords(x, y, x + (width / 2), y + height)
+        self.endgame = True
 
 
-
-
-                
-        def main(self):
-                window = tk.Tk()
-                window.title(" Jumping Jack ")
-                window.geometry("1500x700")
-                self.canvas=Canvas(window,height=100, width=100,bg="orange")
-                self.canvas.pack(expand=YES, fill=BOTH)
-
-                
-                
-                self.images_left = [
-                PhotoImage(file="res/runningPos1Left.png"),
-                PhotoImage(file="res/runningPos2Left.png"),
-                PhotoImage(file="res/runningPos3Left.png")
-                ]
-
-                self.images_right = [
-                PhotoImage(file ="res/runningPos1Right.png"),
-                PhotoImage(file="res/runningPos2Right.png"),
-                PhotoImage(file="res/runningPos3Right.png")
-                ]
-
-                self.images_platforms = [
-                PhotoImage(file ="res/stickman platforms.png"),
-                PhotoImage(file="res/stickman_obstacle.png"),
-                PhotoImage(file="res/stickman_destination.png")]
-
-                
-
-                
-                
-                #assigning the keys to positions
-                window.bind('<Right>', self.right_pos)
-                window.bind('<Left>',self.left_pos)
-                window.bind('<Up>',self.jump_pos)
-                window.bind('<n>',self.display_platforms_Layout1)
-                                 
-                
-                window.mainloop()
-
-                   
-s=stickman()
-s.main()
+g = Game()
+platform1 = PlatformSprite(g, PhotoImage(file="res/stickman_platform1.png"), 0, 486, 100, 16)
+platform2 = PlatformSprite(g, PhotoImage(file="res/stickman_platform1.png"), 150, 446, 100, 16)
+platform3 = PlatformSprite(g, PhotoImage(file="res/stickman_platform1.png"), 300, 406, 100, 16)
+platform4 = PlatformSprite(g, PhotoImage(file="res/stickman_platform1.png"), 300, 166, 100, 16)
+platform5 = PlatformSprite(g, PhotoImage(file="res/stickman_platform2.png"), 175, 351, 66, 11)
+platform6 = PlatformSprite(g, PhotoImage(file="res/stickman_platform2.png"), 50, 301, 66, 11)
+platform7 = PlatformSprite(g, PhotoImage(file="res/stickman_platform2.png"), 170, 121, 66, 11)
+platform8 = PlatformSprite(g, PhotoImage(file="res/stickman_platform2.png"), 45, 59, 66, 11)
+platform9 = PlatformSprite(g, PhotoImage(file="res/stickman_platform3.png"), 170, 245, 32, 5)
+platform10 = PlatformSprite(g, PhotoImage(file="res/stickman_platform3.png"), 230, 195, 32, 5)
+g.sprites.append(platform1)
+g.sprites.append(platform2)
+g.sprites.append(platform3)
+g.sprites.append(platform4)
+g.sprites.append(platform5)
+g.sprites.append(platform6)
+g.sprites.append(platform7)
+g.sprites.append(platform8)
+g.sprites.append(platform9)
+g.sprites.append(platform10)
+door = DoorSprite(g, PhotoImage(file="res/door1.gif"), 45, 30, 40, 35)
+g.sprites.append(door)
+sf = StickFigureSprite(g)
+g.sprites.append(sf)
+g.mainloop()
