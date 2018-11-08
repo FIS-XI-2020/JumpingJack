@@ -1,24 +1,26 @@
 from tkinter import *
 import random
 import time
-
+import math
 class Game:
     def __init__(self):
         self.tk = Tk()
         self.tk.title("Mr. Stick Man Races for the Exit")
         self.tk.resizable(0, 0)
-        self.tk.wm_attributes("-topmost", 1)
-        self.canvas = Canvas(self.tk, width=500, height=500, highlightthickness=0)
-        self.canvas.pack()
-        self.tk.update()
         self.canvas_height = 500
         self.canvas_width = 500
-        self.bg = PhotoImage(file="res/background.gif")
+        self.tk.wm_attributes("-topmost", 1)
+        self.canvas = Canvas(self.tk, width=self.canvas_width, height=self.canvas_height, highlightthickness=0)
+        self.canvas.pack()
+        self.tk.update()
+        self.bg = PhotoImage(file="res/sky.png")
         w = self.bg.width()
         h = self.bg.height()
-        for x in range(0, 5):
-            for y in range(0, 5):
+        y=0
+        for x in range(0, int(math.ceil(self.canvas_height/h)+1)):
+            for y in range(0, int(math.ceil(self.canvas_width/w)+1)):
                 self.canvas.create_image(x * w, y * h, image=self.bg, anchor='nw')
+       
         self.sprites = []
         self.running = True
 
@@ -174,57 +176,57 @@ class StickFigureSprite(Sprite):
             self.jump_count -= 1
             
         co = self.coords()
-        left = True
-        right = True
-        top = True
-        bottom = True
-        falling = True
+        left = False
+        right = False
+        top = False
+        bottom = False
+        falling = False
         
         if self.y > 0 and co.y2 >= self.game.canvas_height:
             self.y = 0
-            bottom = False
+            bottom = True
         elif self.y < 0 and co.y1 <= 0:
             self.y = 0
-            top = False
+            top = True
 
         if self.x > 0 and co.x2 >= self.game.canvas_width:
             self.x = 0
-            right = False
+            right = True
         elif self.x < 0 and co.x1 <= 0:
             self.x = 0
-            left = False
+            left = True
 
         for sprite in self.game.sprites:
             if sprite == self:
                 continue
             sprite_co = sprite.coords()
-            if top and self.y < 0 and collided_top(co, sprite_co):
+            if not(top) and self.y < 0 and collided_top(co, sprite_co):
                 self.y = -self.y
                 top = False
                 
-            if bottom and self.y > 0 and collided_bottom(self.y, co, sprite_co):
+            if not(bottom) and self.y > 0 and collided_bottom(self.y, co, sprite_co):
                 self.y = sprite_co.y1 - co.y2
                 if self.y < 0:
                     self.y = 0
                 bottom = False
                 top = False
 
-            if bottom and falling and self.y == 0 and co.y2 < self.game.canvas_height and collided_bottom(1, co, sprite_co):
-                falling = False
+            if not(bottom) and not(falling) and self.y == 0 and co.y2 < self.game.canvas_height and collided_bottom(1, co, sprite_co):
+                falling = True
                 
-            if left and self.x < 0 and collided_left(co, sprite_co):
+            if not(left) and self.x < 0 and collided_left(co, sprite_co):
                 self.x = 0
                 left = False
                 if sprite.endgame:
                     self.game.running = False
 
-            if right and self.x > 0 and collided_right(co, sprite_co):
+            if not(right) and self.x > 0 and collided_right(co, sprite_co):
                 self.x = 0
                 right = False
                 if sprite.endgame:
                     self.game.running = False
             
-        if falling and bottom and self.y == 0 and co.y2 < self.game.canvas_height:
+        if not(falling) and not(bottom) and self.y == 0 and co.y2 < self.game.canvas_height:
             self.y = 4
         
         self.game.canvas.move(self.image, self.x, self.y)
