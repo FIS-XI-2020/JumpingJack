@@ -28,7 +28,7 @@ window = pygame.display.set_mode((900, 700))
 """
 def button(text, colorname, x, y, w, h, tx, ty):
     color = eval(colorname)
-    
+
     pygame.draw.rect(window, color, [x, y, w, h])
     display_text(text, (tx, ty), "res/SansPosterBold.ttf", 40)
 
@@ -43,7 +43,7 @@ def button(text, colorname, x, y, w, h, tx, ty):
 
             if click[0]:
                 return True
-        
+
 """
     Function to display text on any surface, provided the co-ordinates,
     font, size etc
@@ -62,7 +62,7 @@ def display_text(text, place, font, size):
 def mainmenu():
     run = True
     bg = pygame.image.load("res/bg_mainwindow.png")
-    
+
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -81,25 +81,30 @@ def mainmenu():
         pygame.display.update()
         clock.tick(15)
 
-platform_coord = []
+platform_coord = [(291, 567), (463, 504), (649, 547), (739, 443), (409, 377), (206, 328), (61, 273), (43, 193), (150, 183), (382, 134), (567, 122), (636, 252)]
 
-while len(platform_coord)<30:
-    px=random.randrange(20, 800, 20)
-    py=random.randrange(30, 550, 20)
+"""while len(platform_coord)<30:
+    px=random.randint(20, 800)
+    py=random.randint(30, 550)
     if len(platform_coord)>=1:
+        isgood=True
         for j in platform_coord:
-            if (abs(j[0]-px) in range(120, 220)) and (abs(j[1]-py) in range(120, 200)):
-                platform_coord.append((px, py))
+            if not ((abs(j[0]-px) in range(60,140)) and (abs(j[1]-py) in range(60, 140))):
+                isgood=False
+                break
+        if isgood:
+            platform_coord.append((px, py))
     else:
         platform_coord.append((px, py))
-            
+    print(px, py, platform_coord)"""
+
 def redraw():
     bg = pygame.image.load("res/bg_game.png")
     window.blit(bg, (0, 0))
     for coord in platform_coord:
         platform = pygame.image.load("res/platform.png")
         window.blit(platform, (coord[0], coord[1]))
-        
+
 def gameloop():
     stickman = pygame.image.load("res/stickman_left.png")
     direction = "right"
@@ -109,7 +114,7 @@ def gameloop():
     pygame.display.update()
 
     #print(platform_coord)
-    
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -131,7 +136,7 @@ def gameloop():
                     window.blit(stickman_right[i], (x,y))
                     pygame.display.flip()
                 direction="jumping_right"
-            
+
         elif key[K_LEFT]:
             if x>=50:
                 for i in range(0, 3):
@@ -140,9 +145,9 @@ def gameloop():
                     window.blit(stickman_left[i], (x,y))
                     pygame.display.flip()
                 direction="jumping_left"
-        
+
         elif key[K_UP]:
-            velocity=25
+            velocity=35
             iskeyright=False
             iskeyleft=False
             for event in pygame.event.get():
@@ -151,7 +156,7 @@ def gameloop():
                         iskeyright = True
                     elif event.key==K_LEFT:
                         iskeyleft = True
-            for i in range(0, 9):
+            for i in range(0, 20):
                 velocity-=5
                 y-=velocity
                 for event in pygame.event.get():
@@ -160,15 +165,26 @@ def gameloop():
                             iskeyright = True
                         elif event.key==K_LEFT:
                             iskeyleft = True
-                
+
                 if x<=760 and iskeyright:
-                    x+=7
+                    x+=15
                 elif x>=50 and iskeyleft:
                     direction="jumping_left"
-                    x-=7
+                    x-=15
                 redraw()
                 window.blit(stickman, (x,y))
                 pygame.display.flip()
+
+                onplatform=False
+
+                for i in platform_coord:
+                    print(x, y+94, i[0], i[1])
+                    if (y+94 == i[1]) and (x in range(i[0], i[0]+100)):
+                        onplatform=True
+                        break
+
+                if onplatform:
+                    break
 
         pygame.display.flip()
 
