@@ -81,22 +81,7 @@ def mainmenu():
         pygame.display.update()
         clock.tick(15)
 
-platform_coord = [(291, 567), (463, 504), (649, 547), (739, 443), (409, 377), (206, 328), (61, 273), (43, 193), (150, 183), (382, 134), (567, 122), (636, 252)]
-
-"""while len(platform_coord)<30:
-    px=random.randint(20, 800)
-    py=random.randint(30, 550)
-    if len(platform_coord)>=1:
-        isgood=True
-        for j in platform_coord:
-            if not ((abs(j[0]-px) in range(60,140)) and (abs(j[1]-py) in range(60, 140))):
-                isgood=False
-                break
-        if isgood:
-            platform_coord.append((px, py))
-    else:
-        platform_coord.append((px, py))
-    print(px, py, platform_coord)"""
+platform_coord = [(291, 567), (463, 504), (572, 453), (739, 443), (409, 377), (206, 328), (61, 273), (257, 189), (405, 180), (567, 122), (636, 252)]
 
 def redraw():
     bg = pygame.image.load("res/bg_game.png")
@@ -105,6 +90,21 @@ def redraw():
         platform = pygame.image.load("res/platform.png")
         window.blit(platform, (coord[0], coord[1]))
 
+"""
+    Function to check whether stickman is on platform
+"""
+def platformcheck(x, y):
+    onplatform=False
+    for i in platform_coord:
+        #print(x, y+94, i[0], i[1])
+        if (i[1] in range(y+78, y+94)) and (x in range(i[0]-64, i[0]+100)):
+            onplatform=True
+            break
+    return onplatform
+
+"""
+    Main game loop
+"""
 def gameloop():
     stickman = pygame.image.load("res/stickman_left.png")
     direction = "right"
@@ -128,26 +128,32 @@ def gameloop():
 
         window.blit(stickman, (x,y))
 
-        if key[K_RIGHT]:
+        collision=False
+        """for i in platform_coord:
+            if ((x+64 in range(i[0]-11, i[0]+11)) or (x in range(i[0]-11, i[0]+11))) and (i[1] in range(y, y+92)):
+                collision=True
+                break"""
+
+        if key[K_RIGHT] and not collision:
             if x<=760:
                 for i in range(0, 3):
-                    x+=10
+                    x+=8
                     redraw()
                     window.blit(stickman_right[i], (x,y))
                     pygame.display.flip()
                 direction="jumping_right"
 
-        elif key[K_LEFT]:
+        elif key[K_LEFT] and not collision:
             if x>=50:
                 for i in range(0, 3):
-                    x-=10
+                    x-=8
                     redraw()
                     window.blit(stickman_left[i], (x,y))
                     pygame.display.flip()
                 direction="jumping_left"
 
         elif key[K_UP]:
-            velocity=35
+            velocity=15
             iskeyright=False
             iskeyleft=False
             for event in pygame.event.get():
@@ -156,8 +162,9 @@ def gameloop():
                         iskeyright = True
                     elif event.key==K_LEFT:
                         iskeyleft = True
-            for i in range(0, 20):
-                velocity-=5
+            for i in range(0, 29):
+                jumping=True
+                velocity-=1
                 y-=velocity
                 for event in pygame.event.get():
                     if event.type==KEYDOWN:
@@ -167,27 +174,28 @@ def gameloop():
                             iskeyleft = True
 
                 if x<=760 and iskeyright:
-                    x+=15
+                    x+=8
                 elif x>=50 and iskeyleft:
                     direction="jumping_left"
-                    x-=15
+                    x-=8
                 redraw()
                 window.blit(stickman, (x,y))
                 pygame.display.flip()
 
-                onplatform=False
-
-                for i in platform_coord:
-                    print(x, y+94, i[0], i[1])
-                    if (y+94 == i[1]) and (x in range(i[0], i[0]+100)):
-                        onplatform=True
-                        break
-
-                if onplatform:
+                if platformcheck(x, y):
+                    jumping=False
                     break
 
-        pygame.display.flip()
+        if not platformcheck(x, y):
+            downvel=5
+            while y<530:
+                y+=downvel
+                downvel+=1
+                redraw()
+                window.blit(stickman, (x,y))
+                pygame.display.flip()
 
+        pygame.display.flip()
 
 mainmenu()
 pygame.quit()
