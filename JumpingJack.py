@@ -1,4 +1,4 @@
-import pygame, random, itertools, sys
+import pygame, itertools, sys
 from pygame import *
 
 # Set of colours (R,G,B)
@@ -85,7 +85,7 @@ def mainmenu():
         pygame.display.update()
 
 # Set of coordinates for the platforms & destination platform in (x, y) format
-platform_coord = [(291, 567), (463, 504), (571, 431), (739, 443), (382, 353), (206, 328), (66, 238), (254, 143), (405, 180), (567, 122), (636, 252)]
+platform_coord = [(291, 567), (463, 504), (571, 431), (739, 443), (382, 353), (206, 328), (66, 238), (254, 143), (419, 163), (567, 122), (636, 252)]
 destcoord = (758, 89)
 
 """
@@ -96,7 +96,7 @@ def redraw():
     dest = pygame.image.load("res/destination.png")
     window.blit(bg, (0, 0))
     window.blit(dest, (destcoord))
-    
+
     for i in platform_coord:
         platform = pygame.image.load("res/platform.png")
         window.blit(platform, (i[0], i[1]))
@@ -107,15 +107,15 @@ def redraw():
 def platformcheck(x,y):
     onplatform=False
     win=False
-    
+
     for i in platform_coord:
         if (i[1] in range(y+78, y+94)) and (x in range(i[0]-50, i[0]+80)):                      # All other platforms
             onplatform=True
             break
-    
+
     if (destcoord[1] in range(y+78, y+94)) and (x in range(destcoord[0]-50, destcoord[0]+80)):  # Destination platform
         win=True
-    
+
     return (onplatform, win)
 
 """
@@ -146,7 +146,7 @@ def win(time):
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False                 # Quit when the user clicks the exit button
-            
+
         bg = pygame.image.load("res/bg_game.png")
         window.blit(bg, (0, 0))
 
@@ -191,36 +191,43 @@ def score(time):
     scores = open("res/scores.txt","a+")
 
     scores.write('\n'+str(score))
-    
+
     return score
 
+"""
+    Display list of high scores (top 5)
+"""
 def highscores():
     run=True
     while run:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False                 # Quit when the user clicks the exit button
-            
+
         bg = pygame.image.load("res/bg_game.png")
         window.blit(bg, (0, 0))
-        
+
         scores=[]
 
         # Read the scores.txt file which has all scores saved in it
-        with open("res/scores.txt","r") as scorelist:
-            for score in scorelist:
-                if len(scores)<6 and score != '\n':
-                    scores.append(int(score))
-        
+        try:
+            scorelist = open("res/scores.txt","r+")
+        except FileNotFoundError:
+            scorelist = open("res/scores.txt","a+")
+
+        for score in scorelist:
+            if len(scores)<6 and score != '\n':
+                scores.append(int(score))
+
         # Append score '0' if score doesnt exist (min 5 scores needed)
         if len(scores)<5:
             while len(scores)<6:
                 scores.append(0)
 
         scores.sort(reverse=True)
-        
+
         display_text('HIGH SCORES:', (450, 210), "res/SansPosterBold.ttf", "orange", 50)
-        
+
         y=280
         num=1
         for i in scores:
@@ -247,7 +254,7 @@ def gameloop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run=False                 # Quit when the user clicks the exit button
-        
+
         # We need only the time since we started playing the game
         time = pygame.time.get_ticks() - curtime
 
@@ -256,6 +263,7 @@ def gameloop():
 
         # Draw the background & the platforms
         redraw()
+        print(mouse.get_pos())
 
         # Prepare animation for stickman's movement
         stickman = pygame.image.load("res/stickman_"+direction+".png")
@@ -325,7 +333,7 @@ def gameloop():
                     direction="jumping_left"
                     if collisioncheck(x-8,y) and not ((platformcheck(x, y))[0] or (platformcheck(x, y))[1]): break      # Stop moving if the stickman is hitting a platform
                     x-=8
-                    
+
                 redraw()
                 showtime()
                 window.blit(stickman, (x,y))
@@ -338,7 +346,7 @@ def gameloop():
         # Fall down if stickman is not on a platform
         if not ((platformcheck(x, y))[0] or (platformcheck(x, y))[1]):
             downvel=12
-            
+
             while y<=520:
                 falling=True
                 y+=downvel
