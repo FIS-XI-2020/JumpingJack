@@ -1,0 +1,58 @@
+
+
+Stickman program depenencies
+============================
+To run the program, we need python3 and the following python packages
+tkinter
+
+To start the program use the command below
+========================================
+python3 Movement_of_Stickman.py 
+
+How to Play the game 
+===================
+The movement of the stickman is decided by three keys - the left key, right key and the space bar.
+ On pressing the left arrow key the stickman moves to the left 
+ On pressing the right arrow key the stickman moves to the right
+ On pressing the space bar the stickman jumps up.
+when the stickman falls off from one of the platforms it will land on either a platform in its path or on the ground.
+The main objective of the game is to make the stickman reach the door at the top leftmost corner of the window.
+
+Program description
+===================
+
+Tkinter coordinates 
+
+(0,0)    ----------  (0,500)
+           |           |
+           |           |
+           ---------- 
+(500,0)            (500,500)
+
+The stickman starts at (200, 470) which is in the middle on the floor.
+
+The stickman is always moving till he is blocked by an obstruction. An obstruction is the walls of the game, the floor, the ceiling and the 9 platforms. The platforms are at various heights on the game. 
+
+The algorithm checks if the stickman lands on the platform or is blocked by the platform.           
+
+When the stickman is moving right, the x position of the stickman is increased by a delta of 2 every 10 milli second. The delta is made zero when he reaches an obstacle (platform or a wall). 
+
+When stickman jumps up, it moves 20 times by a step of four and then starts falling off till it lands on a platform or the floor.
+
+When the stickman reaches the door, the game is complete. The door is also an obstacle and when the stickman reaches the obstacle, the game is declared over.
+
+Program Design
+===============
+The class diagram is also available in the repo
+
+The game class has an array of sprite classes. 
+Inheritence
+The sprite class uses inheritance. The sprite class is the base class and it has 3 child classes, the platform sprite, the stickman sprite and the door sprite. 
+
+Polymorphism
+The platform sprite and door sprite cannot move and so the move function does nothing. The move of the stickman sprite does all the movements. Polymorphism is used here.
+
+All the sprite has coordinates and is has associated coords class.
+
+The game class has all the sprites and implements the mainloop function which is the starting point of the game.
+
